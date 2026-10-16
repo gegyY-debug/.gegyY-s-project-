@@ -1,0 +1,413 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f3efe5">
+<title>gegyY · private spaces</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f3efe5;
+  --panel: rgba(255,255,255,.56);
+  --text: #292b25;
+  --muted: #85867b;
+  --accent: #8b967a;
+  --bubble: #e4e9dc;
+  --border: rgba(65,70,53,.12);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #20221f;
+  --panel: rgba(255,255,255,.055);
+  --text: #f1efe6;
+  --muted: #a5a79a;
+  --accent: #aab89a;
+  --bubble: #343b31;
+  --border: rgba(255,255,255,.09);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, sans-serif;
+  transition: background .35s, color .35s;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+.app {
+  max-width: 480px;
+  min-height: 100vh;
+  margin: auto;
+  padding: 24px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 65px;
+}
+.logo {
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -1.5px;
+}
+.logo span { color: var(--accent); }
+.glass {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 12px 38px rgba(50,50,35,.045);
+}
+.icon {
+  width: 43px;
+  height: 43px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 18px;
+}
+.hero { position: relative; }
+.eyebrow {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 10px;
+  font-weight: 700;
+}
+h1 {
+  font-size: clamp(42px, 12vw, 61px);
+  line-height: .99;
+  letter-spacing: -3.5px;
+  margin: 20px 0;
+  font-weight: 650;
+}
+h1 em {
+  color: var(--accent);
+  font-weight: 500;
+}
+.intro {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+  max-width: 300px;
+}
+.orb {
+  position: absolute;
+  width: 155px;
+  height: 155px;
+  border-radius: 42% 58% 65% 35% / 44% 40% 60% 56%;
+  background: linear-gradient(140deg,#cbd5b9,#a1ad8d 55%,#e3d8c2);
+  right: -32px;
+  top: 5px;
+  opacity: .68;
+  filter: blur(1px);
+  animation: float 8s ease-in-out infinite alternate;
+  z-index: -1;
+}
+@keyframes float {
+  to { transform: translate(-8px,12px) rotate(18deg); border-radius: 58% 42% 37% 63% / 54% 65% 35% 46%; }
+}
+.actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 38px;
+}
+.action {
+  width: 100%;
+  min-height: 62px;
+  border-radius: 20px;
+  padding: 0 19px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border);
+  color: var(--text);
+  background: var(--panel);
+  transition: transform .22s, background .25s;
+}
+.action:active { transform: scale(.975); }
+.action.primary {
+  color: #fff;
+  background: #35392f;
+  border-color: transparent;
+}
+[data-theme="dark"] .action.primary {
+  background: #c6d0b5;
+  color: #25271f;
+}
+.action strong { font-size: 14px; }
+.action small { color: var(--muted); font-size: 12px; }
+.action.primary small { color: inherit; opacity: .7; }
+.arrow { font-size: 20px; }
+.footer {
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  margin-top: 42px;
+}
+.screen {
+  display: none;
+  animation: appear .35s ease both;
+}
+.screen.active { display: block; }
+@keyframes appear {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.back {
+  border: 0;
+  background: none;
+  color: var(--text);
+  padding: 8px 0;
+  margin-bottom: 25px;
+}
+h2 { font-size: 32px; letter-spacing: -1.5px; }
+.field {
+  width: 100%;
+  padding: 16px;
+  margin: 7px 0 16px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  outline: none;
+}
+.field:focus { border-color: var(--accent); }
+.hint { font-size: 12px; color: var(--muted); }
+.roomhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.roomhead h2 { font-size: 22px; margin: 0 0 5px; }
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 0;
+  min-height: 280px;
+}
+.msg { max-width: 84%; animation: appear .25s ease both; }
+.msg.mine { align-self: flex-end; text-align: right; }
+.name { font-size: 11px; color: var(--muted); margin: 0 8px 5px; }
+.bubble {
+  display: inline-block;
+  padding: 12px 15px;
+  border-radius: 19px 19px 19px 5px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  text-align: left;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+.mine .bubble {
+  background: var(--bubble);
+  border-radius: 19px 19px 5px 19px;
+}
+.composer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 7px;
+  border-radius: 25px;
+  position: sticky;
+  bottom: 12px;
+}
+.composer .field { margin: 0; border: 0; min-width: 0; padding: 12px; background: transparent; }
+.send {
+  flex: 0 0 43px;
+  height: 43px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 19px;
+  transition: transform .2s;
+}
+.send:active { transform: scale(.88); }
+.notice {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  padding: 10px 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="logo">gegy<span>Y</span><div class="eyebrow">PRIVATE SPACES</div></div>
+    <button class="icon" id="theme" aria-label="Changer le thème">☾</button>
+  </header>
+
+  <main>
+    <section class="screen active" id="home">
+      <div class="hero">
+        <div class="orb"></div>
+        <div class="eyebrow">A little space, just us.</div>
+        <h1>Closer,<br>without<br><em>the noise.</em></h1>
+        <p class="intro">Des conversations privées, des espaces à vous. Entrez avec une clé, retrouvez-vous en quelques secondes.</p>
+      </div>
+      <div class="actions">
+        <button class="action primary" onclick="show('create')">
+          <span><strong>Créer un salon</strong><br><small>Un espace à partager</small></span><span class="arrow">↗</span>
+        </button>
+        <button class="action" onclick="show('join')">
+          <span><strong>Rejoindre un salon</strong><br><small>J'ai déjà une clé</small></span><span class="arrow">→</span>
+        </button>
+      </div>
+      <div class="footer">Jusqu'à 10 personnes · Votre espace, vos échanges</div>
+    </section>
+
+    <section class="screen" id="create">
+      <button class="back" onclick="show('home')">← Retour</button>
+      <div class="eyebrow">YOUR OWN SPACE</div>
+      <h2>Créons votre salon.</h2>
+      <label for="newname">Votre pseudo</label>
+      <input class="field" id="newname" maxlength="24" placeholder="Comment vous appeler ?">
+      <label for="roomname">Nom du salon</label>
+      <input class="field" id="roomname" maxlength="32" placeholder="Ex. Les proches">
+      <button class="action primary" onclick="createRoom()"><strong>Créer mon salon</strong><span>↗</span></button>
+      <p class="hint">Prototype visuel : le salon n'est pas encore partagé entre appareils.</p>
+    </section>
+
+    <section class="screen" id="join">
+      <button class="back" onclick="show('home')">← Retour</button>
+      <div class="eyebrow">COME ON IN</div>
+      <h2>On se retrouve ?</h2>
+      <label for="joinname">Votre pseudo</label>
+      <input class="field" id="joinname" maxlength="24" placeholder="Comment vous appeler ?">
+      <label for="roomkey">Clé du salon</label>
+      <input class="field" id="roomkey" maxlength="12" placeholder="Saisir la clé">
+      <button class="action primary" onclick="joinRoom()"><strong>Entrer dans le salon</strong><span>→</span></button>
+      <p class="hint">Le vrai accès partagé sera activé avec le serveur.</p>
+    </section>
+
+    <section class="screen" id="chat">
+      <button class="back" onclick="show('home')">← Quitter l'aperçu</button>
+      <div class="roomhead">
+        <div><h2 id="chatname">Notre salon</h2><div class="hint">● Aperçu local · 1 personne</div></div>
+        <button class="icon" onclick="shareRoom()" aria-label="Partager la clé">↗</button>
+      </div>
+      <div class="notice" id="keynotice"></div>
+      <div class="messages" id="messages">
+        <div class="msg"><div class="name">gegyY</div><div class="bubble">Bienvenue dans votre espace 🌿</div></div>
+      </div>
+      <div class="notice" id="typing"></div>
+      <form class="composer glass" id="composer">
+        <button type="button" class="icon" id="emoji" aria-label="Ajouter un emoji">☺</button>
+        <input class="field" id="message" maxlength="1500" placeholder="Écrire un message…" autocomplete="off">
+        <button class="send" type="submit" aria-label="Envoyer">↑</button>
+      </form>
+      <p class="hint">Démo locale : les messages ne sont pas envoyés aux autres appareils.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let currentKey = "";
+let nickname = "Invité";
+let currentRoom = "Notre salon";
+
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+}
+
+$("theme").addEventListener("click", () => {
+  const dark = document.body.dataset.theme !== "dark";
+  document.body.dataset.theme = dark ? "dark" : "light";
+  $("theme").textContent = dark ? "☀" : "☾";
+});
+
+function makeKey() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let key = "";
+  for (let i = 0; i < 6; i++) key += chars[Math.floor(Math.random() * chars.length)];
+  return key;
+}
+
+function createRoom() {
+  nickname = $("newname").value.trim();
+  currentRoom = $("roomname").value.trim() || "Notre salon";
+  if (!nickname) { $("newname").focus(); alert("Choisis d'abord un pseudo."); return; }
+  currentKey = makeKey();
+  enterPreview();
+}
+
+function joinRoom() {
+  nickname = $("joinname").value.trim();
+  currentKey = $("roomkey").value.trim().toUpperCase();
+  if (!nickname || !currentKey) { alert("Entre ton pseudo et la clé du salon."); return; }
+  currentRoom = "Salon " + currentKey;
+  enterPreview();
+}
+
+function enterPreview() {
+  $("chatname").textContent = currentRoom;
+  $("keynotice").textContent = "Clé de démonstration : " + currentKey;
+  $("messages").innerHTML = '<div class="msg"><div class="name">gegyY</div><div class="bubble">Bienvenue, ' + escapeHTML(nickname) + ' 🌿</div></div>';
+  show("chat");
+}
+
+function escapeHTML(text) {
+  return text.replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+$("composer").addEventListener("submit", e => {
+  e.preventDefault();
+  const input = $("message");
+  const value = input.value.trim();
+  if (!value) return;
+  const item = document.createElement("div");
+  item.className = "msg mine";
+  item.innerHTML = '<div class="name">' + escapeHTML(nickname) + ' · maintenant</div><div class="bubble">' + escapeHTML(value) + '</div><div class="hint">✓ Envoyé localement</div>';
+  $("messages").appendChild(item);
+  input.value = "";
+  $("typing").textContent = "";
+  item.scrollIntoView({behavior:"smooth", block:"nearest"});
+});
+
+$("emoji").addEventListener("click", () => {
+  const input = $("message");
+  input.value += " 😊";
+  input.focus();
+});
+
+$("message").addEventListener("input", () => {
+  $("typing").textContent = $("message").value.trim() ? "Vous écrivez…" : "";
+});
+
+function shareRoom() {
+  const text = "Rejoins mon salon gegyY avec la clé : " + currentKey;
+  if (navigator.share) {
+    navigator.share({title:"Mon salon gegyY", text}).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => alert("Clé copiée !")).catch(() => alert(text));
+  } else {
+    alert(text);
+  }
+}
+</script>
+</body>
+</html>
+
