@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5efe4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>gegyY</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+/* ============ Thèmes (beige organique par défaut) ============ */
+:root, body[data-theme="beige"] {
+  --bg: #f5efe4; --bg2: #ede4d3; --ink: #2e2a24; --muted: #8a8272;
+  --panel: rgba(255,252,246,.72); --border: rgba(70,55,35,.14);
+  --accent: #b0703c; --accent-ink: #fff; --bubble: #efe2cd; --bubble-mine: #d8a26b;
+  --danger: #b0463c; --ok: #4f8a5e;
+}
+body[data-theme="night"] {
+  --bg: #14161a; --bg2: #1b1e24; --ink: #ece7dd; --muted: #9a958a;
+  --panel: rgba(255,255,255,.06); --border: rgba(255,255,255,.12);
+  --accent: #d8a26b; --accent-ink: #20160c; --bubble: #23262d; --bubble-mine: #8a5f36;
+  --danger: #d96c60; --ok: #6fbf87;
+}
+body[data-theme="forest"] {
+  --bg: #eef2ec; --bg2: #e2e9e0; --ink: #22301f; --muted: #7c8a78;
+  --panel: rgba(255,255,255,.7); --border: rgba(40,70,35,.14);
+  --accent: #4f8a5e; --accent-ink: #fff; --bubble: #dde8d9; --bubble-mine: #9cc4a3;
+  --danger: #b0463c; --ok: #3f7a4e;
+}
+body[data-theme="rose"] {
+  --bg: #f8eef0; --bg2: #f3e2e6; --ink: #3a262b; --muted: #a08a8f;
+  --panel: rgba(255,250,251,.75); --border: rgba(90,40,55,.14);
+  --accent: #c26d84; --accent-ink: #fff; --bubble: #f2dce2; --bubble-mine: #e3a9ba;
+  --danger: #b0463c; --ok: #4f8a5e;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background:
+    radial-gradient(120% 90% at 100% 0%, var(--bg2), transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  min-height: 100vh; transition: background .3s, color .3s;
+}
+.app {
+  max-width: 520px; margin: 0 auto; min-height: 100vh;
+  padding: max(16px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column;
+}
+.top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.logo { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+.logo span { color: var(--accent); }
+.eyebrow { font-size: 11px; letter-spacing: .12em; color: var(--muted); font-weight: 500; }
+.icon {
+  flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--panel);
+  color: var(--ink); font-size: 17px; cursor: pointer;
+}
+.icon:active { transform: scale(.92); }
+main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.screen { display: none; flex: 1; flex-direction: column; padding-top: 16px; min-height: 0; }
+.screen.active { display: flex; animation: appear .3s ease both; }
+@keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.hero { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 0; }
+.orb {
+  width: 110px; height: 110px; border-radius: 50%; margin-bottom: 24px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.7), var(--accent));
+  opacity: .85; animation: float 6s ease-in-out infinite;
+}
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+h1 { font-size: 44px; line-height: 1.05; margin: 10px 0 14px; letter-spacing: -.03em; }
+h1 em { color: var(--accent); font-style: normal; }
+h2 { font-size: 25px; margin: 8px 0 12px; letter-spacing: -.02em; }
+.intro { color: var(--muted); max-width: 34ch; margin: 0; }
+.actions { display: grid; gap: 12px; margin: 20px 0; }
+.action {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  width: 100%; padding: 15px 17px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--panel); color: var(--ink);
+  font: inherit; text-align: left; cursor: pointer; transition: transform .15s;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.action:active { transform: scale(.98); }
+.action.primary { background: var(--accent); border-color: transparent; color: var(--accent-ink); }
+.action small { opacity: .75; }
+.arrow { font-size: 20px; }
+.footer { text-align: center; font-size: 12px; color: var(--muted); }
+.back { align-self: flex-start; background: none; border: 0; color: var(--muted); font: inherit; padding: 6px 0; margin-bottom: 8px; cursor: pointer; }
+label { display: block; font-size: 12px; color: var(--muted); margin: 14px 0 6px; }
+.field {
+  width: 100%; padding: 13px 15px; border-radius: 16px;
+  border: 1px solid var(--border); background: var(--panel);
+  color: var(--ink); font: inherit; outline: none;
+}
+.field:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.screen > .action.primary { margin-top: 20px; }
+.hint { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+.glass {
+  background: var(--panel); border: 1px solid var(--border);
+  backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4);
+}
+/* ============ Chat ============ */
+.roomhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.roomhead h2 { font-size: 21px; margin: 0 0 4px; }
+.roomhead .meta { display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--muted); }
+.onlinedot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; }
+.messages {
+  flex: 1; display: flex; flex-direction: column; gap: 12px;
+  padding: 16px 0; overflow-y: auto; min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+.day { text-align: center; font-size: 11px; color: var(--muted); }
+.msg { max-width: 86%; animation: appear .22s ease both; position: relative; }
+.msg.mine { align-self: flex-end; text-align: right; }
+.name { font-size: 11px; color: var(--muted); margin: 0 8px 4px; }
+.bubble {
+  display: inline-block; padding: 11px 14px;
+  border-radius: 19px 19px 19px 6px;
+  background: var(--bubble);
+  text-align: left; overflow-wrap: anywhere; font-size: 14px;
+  max-width: 100%;
+  transition: transform .15s;
+}
+.bubble:active { transform: scale(.98); }
+.mine .bubble { background: var(--bubble-mine); border-radius: 19px 19px 6px 19px; }
+.msg.edited .bubble::after { content: " · modifié"; font-size: 10px; opacity: .6; }
+.replyquote {
+  display: block; font-size: 12px; opacity: .75; border-left: 3px solid var(--accent);
+  padding: 2px 8px; margin-bottom: 6px; border-radius: 4px; background: rgba(0,0,0,.05);
+  max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.reactions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.react {
+  border: 1px solid var(--border); background: var(--panel); color: var(--ink);
+  border-radius: 999px; padding: 2px 8px; font-size: 13px; cursor: pointer;
+}
+.react.mine { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.msgtools { display: none; gap: 4px; margin-top: 5px; }
+.msg.open .msgtools { display: flex; }
+.msgtools button {
+  border: 1px solid var(--border); background: var(--panel); color: var(--ink);
+  border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer;
+}
+.msgtools .danger { color: var(--danger); }
+.msg img.att { max-width: 240px; max-height: 240px; border-radius: 14px; display: block; cursor: pointer; }
+.msg audio { max-width: 240px; display: block; }
+.sticker { font-size: 46px; line-height: 1.2; padding: 6px 10px; }
+.notetag { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; display: block; margin-bottom: 4px; }
+a { color: var(--accent); }
+.linkcard {
+  display: flex; gap: 8px; align-items: center; margin-top: 6px; padding: 8px 10px;
+  border: 1px solid var(--border); border-radius: 12px; background: rgba(0,0,0,.04);
+  font-size: 12px; text-decoration: none; color: var(--ink); max-width: 260px;
+}
+.linkcard img { width: 20px; height: 20px; border-radius: 4px; }
+/* Quiz / jeux */
+.quizopt {
+  display: block; width: 100%; margin-top: 6px; padding: 9px 12px; text-align: left;
+  border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,.15);
+  color: var(--ink); font: inherit; font-size: 13px; cursor: pointer;
+}
+.quizopt.correct { border-color: var(--ok); background: rgba(79,138,94,.18); }
+.quizopt.wrongpick { border-color: var(--danger); background: rgba(176,70,60,.15); }
+.quizopt .bar { display: block; height: 4px; border-radius: 2px; background: var(--accent); margin-top: 5px; }
+.gameresult { font-size: 12px; opacity: .8; margin-top: 6px; }
+/* Composer */
+.composerwrap { position: sticky; bottom: 10px; }
+.replybar {
+  display: none; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: 12px; padding: 6px 12px; margin-bottom: 5px;
+  border-radius: 12px; color: var(--muted);
+}
+.replybar.on { display: flex; }
+.composer { display: flex; gap: 6px; align-items: center; padding: 6px; border-radius: 25px; }
+.composer .field { margin: 0; border: 0; min-width: 0; padding: 10px; background: transparent; }
+.composer .icon { flex: 0 0 38px; width: 38px; height: 38px; border: 0; }
+.send {
+  flex: 0 0 42px; height: 42px; border: 0; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink); font-size: 19px; transition: transform .15s;
+}
+.send:active { transform: scale(.88); }
+.notice { font-size: 12px; color: var(--muted); text-align: center; padding: 8px 0; min-height: 30px; }
+/* Tiroir membres + modales */
+.drawer {
+  position: fixed; inset: 0; z-index: 30; pointer-events: none;
+}
+.drawer .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.3); opacity: 0; transition: opacity .25s; }
+.drawer .panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(320px, 85vw);
+  background: var(--bg); border-left: 1px solid var(--border);
+  transform: translateX(100%); transition: transform .25s ease;
+  padding: max(18px, env(safe-area-inset-top)) 16px 16px; overflow-y: auto;
+}
+.drawer.on { pointer-events: auto; }
+.drawer.on .scrim { opacity: 1; }
+.drawer.on .panel { transform: none; }
+.member { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.member .av { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; color: #fff; }
+.member .st { margin-left: auto; font-size: 11px; color: var(--muted); }
+.member .st.on { color: var(--ok); }
+.modal {
+  position: fixed; inset: 0; z-index: 40; display: none;
+  place-items: center; background: rgba(0,0,0,.35); padding: 20px;
+}
+.modal.on { display: grid; }
+.modal .card {
+  width: 100%; max-width: 380px; max-height: 80vh; overflow-y: auto;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 22px; padding: 18px;
+  animation: appear .2s ease both;
+}
+.emojirow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.emojirow button { font-size: 22px; border: 0; background: none; cursor: pointer; padding: 4px; }
+.themeswatches { display: flex; gap: 10px; margin-top: 10px; }
+.swatch { width: 46px; height: 46px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+.swatch.sel { border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body data-theme="beige">
+<div class="app">
+  <header class="top">
+    <div class="logo">gegy<span>Y</span><div class="eyebrow">PRIVATE SPACES</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="icon" id="theme" aria-label="Changer le thème">🎨</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="screen active" id="home">
+      <div class="hero">
+        <div class="orb"></div>
+        <div class="eyebrow">A little space, just us.</div>
+        <h1>Closer,<br>without<br><em>the noise.</em></h1>
+        <p class="intro">Des conversations privées, des espaces à vous. Entrez avec une clé, retrouvez-vous en quelques secondes.</p>
+      </div>
+      <div class="actions">
+        <button class="action primary" onclick="show('create')">
+          <span><strong>Créer un salon</strong><br><small>Un espace à partager</small></span><span class="arrow">↗</span>
+        </button>
+        <button class="action" onclick="show('join')">
+          <span><strong>Rejoindre un salon</strong><br><small>J'ai déjà une clé</small></span><span class="arrow">→</span>
+        </button>
+      </div>
+      <div class="footer">Jusqu'à 10 personnes · Votre espace, vos échanges</div>
+    </section>
+
+    <section class="screen" id="create">
+      <button class="back" onclick="show('home')">← Retour</button>
+      <div class="eyebrow">YOUR OWN SPACE</div>
+      <h2>Créons votre salon.</h2>
+      <label for="newname">Votre pseudo</label>
+      <input class="field" id="newname" maxlength="24" placeholder="Comment vous appeler ?">
+      <label for="roomname">Nom du salon</label>
+      <input class="field" id="roomname" maxlength="32" placeholder="Ex. Les proches">
+      <button class="action primary" onclick="createRoom()"><strong>Créer mon salon</strong><span>↗</span></button>
+      <p class="hint">Une clé sera générée : partagez-la pour inviter vos proches.</p>
+    </section>
+
+    <section class="screen" id="join">
+      <button class="back" onclick="show('home')">← Retour</button>
+      <div class="eyebrow">COME ON IN</div>
+      <h2>On se retrouve ?</h2>
+      <label for="joinname">Votre pseudo</label>
+      <input class="field" id="joinname" maxlength="24" placeholder="Comment vous appeler ?">
+      <label for="roomkey">Clé du salon</label>
+      <input class="field" id="roomkey" maxlength="12" placeholder="Saisir la clé">
+      <button class="action primary" onclick="joinRoom()"><strong>Entrer dans le salon</strong><span>→</span></button>
+      <p class="hint">Demandez la clé à la personne qui a créé le salon.</p>
+    </section>
+
+    <section class="screen" id="chat">
+      <button class="back" onclick="leaveRoom()">← Quitter le salon</button>
+      <div class="roomhead">
+        <div>
+          <h2 id="chatname">Notre salon</h2>
+          <div class="meta"><span class="onlinedot" id="onlinedot"></span><span id="onlinecount">0 en ligne</span><span id="typinginfo"></span></div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="icon" onclick="openGames()" aria-label="Jeux">🎲</button>
+          <button class="icon" onclick="openMembers()" aria-label="Membres">👥</button>
+          <button class="icon" onclick="shareRoom()" aria-label="Partager la clé">↗</button>
+        </div>
+      </div>
+      <div class="notice" id="keynotice"></div>
+      <div class="messages" id="messages"></div>
+      <div class="notice" id="spamwarn" style="color:var(--danger)"></div>
+      <div class="composerwrap">
+        <div class="replybar glass" id="replybar"><span id="replytext"></span><button class="icon" style="width:26px;height:26px;flex-basis:26px;font-size:12px" onclick="cancelReply()">✕</button></div>
+        <form class="composer glass" id="composer">
+          <button type="button" class="icon" id="attachbtn" aria-label="Envoyer une image">🖼</button>
+          <button type="button" class="icon" id="micbtn" aria-label="Message vocal">🎙</button>
+          <button type="button" class="icon" id="notebtn" aria-label="Note 24 h" title="Note qui expire après 24 h">⏳</button>
+          <button type="button" class="icon" id="emoji" aria-label="Stickers">☺</button>
+          <input class="field" id="message" maxlength="1500" placeholder="Écrire un message…" autocomplete="off">
+          <button class="send" type="submit" aria-label="Envoyer">↑</button>
+        </form>
+      </div>
+      <input type="file" id="fileinput" accept="image/*" hidden>
+    </section>
+  </main>
+</div>
+
+<!-- Tiroir membres -->
+<div class="drawer" id="membersdrawer">
+  <div class="scrim" onclick="closeMembers()"></div>
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2 style="margin:0;font-size:20px">Membres</h2>
+      <button class="icon" onclick="closeMembers()">✕</button>
+    </div>
+    <div id="memberslist" style="margin-top:12px"></div>
+    <button class="action" style="margin-top:16px" onclick="openProfile()"><span>✏️ Mon profil</span><span class="arrow">→</span></button>
+  </div>
+</div>
+
+<!-- Modale profil -->
+<div class="modal" id="profilemodal">
+  <div class="card">
+    <h2 style="margin-top:0;font-size:20px">Mon profil</h2>
+    <label for="profilename">Pseudo</label>
+    <input class="field" id="profilename" maxlength="24">
+    <label>Avatar</label>
+    <div class="emojirow" id="avataremojis"></div>
+    <button class="action primary" style="margin-top:18px" onclick="saveProfile()"><strong>Enregistrer</strong></button>
+    <button class="action" style="margin-top:8px" onclick="closeModal('profilemodal')"><span>Annuler</span></button>
+    <p class="hint" id="myuid"></p>
+  </div>
+</div>
+
+<!-- Modale thème -->
+<div class="modal" id="thememodal">
+  <div class="card">
+    <h2 style="margin-top:0;font-size:20px">Thème</h2>
+    <div class="themeswatches" id="swatches"></div>
+    <p class="hint">Le choix est conservé sur cet appareil.</p>
+    <button class="action" style="margin-top:12px" onclick="closeModal('thememodal')"><span>Fermer</span></button>
+  </div>
+</div>
+
+<!-- Modale jeux -->
+<div class="modal" id="gamesmodal">
+  <div class="card">
+    <h2 style="margin-top:0;font-size:20px">Mini-jeux</h2>
+    <button class="action" onclick="newQuiz()"><span>🧠 <strong>Quiz</strong><br><small>Question à choix multiples</small></span><span class="arrow">→</span></button>
+    <button class="action" style="margin-top:10px" onclick="newRiddle()"><span>🤫 <strong>Devinette</strong><br><small>Réponse cachée à révéler</small></span><span class="arrow">→</span></button>
+    <button class="action" style="margin-top:10px" onclick="newWord()"><span>🔀 <strong>Mot mélangé</strong><br><small>Retrouve le mot dans le désordre</small></span><span class="arrow">→</span></button>
+    <button class="action" style="margin-top:12px" onclick="closeModal('gamesmodal')"><span>Annuler</span></button>
+  </div>
+</div>
+
+<!-- Modale quiz -->
+<div class="modal" id="quizmodal">
+  <div class="card">
+    <h2 style="margin-top:0;font-size:20px">Nouveau quiz</h2>
+    <label for="quizq">Question</label>
+    <input class="field" id="quizq" maxlength="200">
+    <label for="quizo">Options (une par ligne, 2 à 4)</label>
+    <textarea class="field" id="quizo" rows="4" maxlength="300"></textarea>
+    <label for="quiza">Bonne réponse (numéro, 1 = première ligne)</label>
+    <input class="field" id="quiza" type="number" min="1" max="4" value="1">
+    <button class="action primary" style="margin-top:16px" onclick="sendQuiz()"><strong>Lancer le quiz</strong></button>
+    <button class="action" style="margin-top:8px" onclick="closeModal('quizmodal')"><span>Annuler</span></button>
+  </div>
+</div>
+
+<!-- Modale devinette -->
+<div class="modal" id="riddlemodal">
+  <div class="card">
+    <h2 style="margin-top:0;font-size:20px">Nouvelle devinette</h2>
+    <label for="riddleq">Devinette</label>
+    <input class="field" id="riddleq" maxlength="200">
+    <label for="riddlea">Réponse (cachée)</label>
+    <input class="field" id="riddlea" maxlength="100">
+    <button class="action primary" style="margin-top:16px" onclick="sendRiddle()"><strong>Envoyer</strong></button>
+    <button class="action" style="margin-top:8px" onclick="closeModal('riddlemodal')"><span>Annuler</span></button>
+  </div>
+</div>
+
+<!-- Modale mot mélangé -->
+<div class="modal" id="wordmodal">
+  <div class="card">
+    <h2 style="margin-top:0;font-size:20px">Mot mélangé</h2>
+    <label for="worda">Mot à faire deviner</label>
+    <input class="field" id="worda" maxlength="20">
+    <p class="hint">Le mot sera mélangé automatiquement. Les joueurs répondent en message normal.</p>
+    <button class="action primary" style="margin-top:16px" onclick="sendWord()"><strong>Envoyer</strong></button>
+    <button class="action" style="margin-top:8px" onclick="closeModal('wordmodal')"><span>Annuler</span></button>
+  </div>
+</div>
+
+<!-- Modale GIF/stickers -->
+<div class="modal" id="emojimodal">
+  <div class="card">
+    <h2 style="margin-top:0;font-size:20px">Stickers &amp; GIF</h2>
+    <div class="emojirow" id="stickerrow"></div>
+    <div id="gifsearch" style="margin-top:14px; display:none">
+      <label for="gifq">Recherche GIF (GIPHY)</label>
+      <input class="field" id="gifq" placeholder="Ex. chat…">
+      <button class="action primary" style="margin-top:10px" onclick="searchGif()"><strong>Chercher</strong></button>
+      <div id="gifresults" class="emojirow" style="max-height:220px;overflow-y:auto"></div>
+    </div>
+    <p class="hint" id="gifhint"></p>
+    <button class="action" style="margin-top:10px" onclick="closeModal('emojimodal')"><span>Fermer</span></button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
+  collection, query, orderBy, limit, onSnapshot, serverTimestamp,
+  writeBatch, arrayUnion, arrayRemove
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getStorage, ref as sref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+
+/* ====== CONFIG : colle ta clé API GIPHY ici si tu veux la recherche GIF ====== */
+const GIPHY_API_KEY = "";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyConX9MSQO2RWE22yjtXH86DB4OOfZmEsc",
+  authDomain: "gegyy-s-project.firebaseapp.com",
+  projectId: "gegyy-s-project",
+  storageBucket: "gegyy-s-project.firebasestorage.app",
+  messagingSenderId: "1030800179583",
+  appId: "1:1030800179583:web:c8882c83ea9dff67acda4a"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
+
+const $ = id => document.getElementById(id);
+let currentKey = "", nickname = "Invité", currentRoom = "Notre salon";
+let unsubMsgs = null, unsubMembers = null;
+let uid = null, isAdmin = false, authReady = false;
+let replyTo = null, noteMode = false, myAvatar = "🙂";
+let membersCache = {};         // uid -> {name, avatar, lastSeen}
+const seenMsgs = new Set();    // anti-doublon local
+let lastSendAt = 0, lastText = "";
+let presenceTimer = null, typingTimer = null;
+const EMOJIS_REACT = ["👍","❤️","😂","😮","😢","🎉","🔥","🤔"];
+const STICKERS = ["😀","😂","🥰","😎","🤯","😴","🤝","👏","🙏","💪","🎉","❤️","🔥","✨","🌙","☕","🍕","🐱","🐶","🌸"];
+const AVATARS = ["🙂","😺","🦊","🐼","🦁","🐸","🌵","🍀","🌙","⭐","🔥","🎧"];
+const WORD_BANK = ["AMITIE","SOLEIL","MUSIQUE","AVENTURE","GATEAU","FORET","ECRAN","BONHEUR","MYSTERE","PLANETE"];
+
+/* ============ Auth anonyme (identité vérifiable côté règles) ============ */
+onAuthStateChanged(auth, user => {
+  if (user) {
+    uid = user.uid; authReady = true;
+    $("myuid").textContent = "Ton identifiant interne : " + uid.slice(0, 8) + "…";
+    checkAdmin();
+    const savedName = localStorage.getItem("gy_name");
+    const savedAv = localStorage.getItem("gy_avatar");
+    if (savedName) { nickname = savedName; $("newname").value = savedName; $("joinname").value = savedName; }
+    if (savedAv) myAvatar = savedAv;
+    if (currentKey) joinPresence();
+  }
+});
+signInAnonymously(auth).catch(e => console.error("Auth:", e));
+
+async function checkAdmin() {
+  try { isAdmin = (await getDoc(doc(db, "admins", uid))).exists(); } catch { isAdmin = false; }
+}
+
+/* ============ Utilitaires ============ */
+function escapeHTML(text) {
+  return String(text).replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+}
+function openModal(id) { $(id).classList.add("on"); }
+function closeModal(id) { $(id).classList.remove("on"); }
+function timeStr(ts) {
+  return ts ? ts.toDate().toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"}) : "…";
+}
+function avatarColor(u) {
+  let h = 0; for (const c of u) h = (h * 31 + c.charCodeAt(0)) % 360;
+  return `hsl(${h},45%,45%)`;
+}
+function makeKey() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let key = "";
+  for (let i = 0; i < 6; i++) key += chars[Math.floor(Math.random() * chars.length)];
+  return key;
+}
+
+/* ============ Thème ============ */
+const THEMES = { beige: ["#f5efe4", "#b0703c"], night: ["#14161a", "#d8a26b"], forest: ["#eef2ec", "#4f8a5e"], rose: ["#f8eef0", "#c26d84"] };
+function applyTheme(name) {
+  document.body.dataset.theme = name;
+  localStorage.setItem("gy_theme", name);
+  document.querySelector('meta[name="theme-color"]').content = THEMES[name][0];
+  renderSwatches();
+}
+function renderSwatches() {
+  $("swatches").innerHTML = "";
+  for (const [name, [bg, ac]] of Object.entries(THEMES)) {
+    const b = document.createElement("button");
+    b.className = "swatch" + (document.body.dataset.theme === name ? " sel" : "");
+    b.style.background = `linear-gradient(135deg, ${bg} 50%, ${ac} 50%)`;
+    b.title = name;
+    b.onclick = () => applyTheme(name);
+    $("swatches").appendChild(b);
+  }
+}
+$("theme").addEventListener("click", () => openModal("thememodal"));
+applyTheme(localStorage.getItem("gy_theme") || "beige");
+
+/* ============ Création / rejoindre ============ */
+async function createRoom() {
+  nickname = $("newname").value.trim().slice(0, 24);
+  currentRoom = $("roomname").value.trim().slice(0, 32) || "Notre salon";
+  if (!nickname) { $("newname").focus(); alert("Choisis d'abord un pseudo."); return; }
+  if (!authReady) { alert("Connexion en cours… réessaie dans un instant."); return; }
+  saveProfileLocal();
+  currentKey = makeKey();
+  try {
+    await setDoc(doc(db, "rooms", currentKey), { name: currentRoom, createdAt: serverTimestamp(), createdBy: uid });
+  } catch (e) {
+    console.error(e);
+    alert("Impossible de créer le salon. Vérifie ta connexion.");
+    return;
+  }
+  enterRoom();
+}
+
+async function joinRoom() {
+  nickname = $("joinname").value.trim().slice(0, 24);
+  currentKey = $("roomkey").value.trim().toUpperCase();
+  if (!nickname || !currentKey) { alert("Entre ton pseudo et la clé du salon."); return; }
+  if (!authReady) { alert("Connexion en cours… réessaie dans un instant."); return; }
+  saveProfileLocal();
+  try {
+    const snap = await getDoc(doc(db, "rooms", currentKey));
+    if (!snap.exists()) { alert("Aucun salon avec cette clé."); return; }
+    currentRoom = snap.data().name || "Salon " + currentKey;
+  } catch (e) {
+    console.error(e);
+    alert("Connexion impossible. Réessaie.");
+    return;
+  }
+  enterRoom();
+}
+
+function saveProfileLocal() {
+  localStorage.setItem("gy_name", nickname);
+  localStorage.setItem("gy_avatar", myAvatar);
+}
+
+/* ============ Entrée / sortie de salon ============ */
+function enterRoom() {
+  $("chatname").textContent = currentRoom;
+  $("keynotice").textContent = "Clé du salon : " + currentKey;
+  $("messages").innerHTML = ""; seenMsgs.clear();
+  listenMessages();
+  listenMembers();
+  joinPresence();
+  show("chat");
+}
+
+function leaveRoom() {
+  if (unsubMsgs) { unsubMsgs(); unsubMsgs = null; }
+  if (unsubMembers) { unsubMembers(); unsubMembers = null; }
+  clearInterval(presenceTimer);
+  currentKey = "";
+  show("home");
+}
+
+/* Présence : écrit lastSeen toutes les 25 s dans members/{uid} */
+async function joinPresence() {
+  clearInterval(presenceTimer);
+  const touch = async () => {
+    if (!currentKey || !uid) return;
+    try {
+      await setDoc(doc(db, "rooms", currentKey, "members", uid),
+        { name: nickname, avatar: myAvatar, lastSeen: serverTimestamp() }, { merge: true });
+    } catch (e) { console.error(e); }
+  };
+  touch();
+  presenceTimer = setInterval(touch, 25000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) touch(); });
+}
+
+/* ============ Anti-spam client ============ */
+function antiSpamOk(text) {
+  const now = Date.now();
+  $("spamwarn").textContent = "";
+  if (now - lastSendAt < 1500) { $("spamwarn").textContent = "Ralentis un peu 😅 (1 message / 1,5 s)"; return false; }
+  if (text === lastText) { $("spamwarn").textContent = "Message identique au précédent."; return false; }
+  lastSendAt = now; lastText = text;
+  return true;
+}
+
+/* ============ Envoi (batch message + lastMsgAt pour les règles) ============ */
+async function pushMessage(data) {
+  if (!currentKey) return;
+  const msgRef = doc(collection(db, "rooms", currentKey, "messages"));
+  const memberRef = doc(db, "rooms", currentKey, "members", uid);
+  const batch = writeBatch(db);
+  batch.set(msgRef, {
+    uid, name: nickname, avatar: myAvatar,
+    createdAt: serverTimestamp(),
+    reactions: {}, answers: {},
+    ...data
+  });
+  batch.set(memberRef, { lastMsgAt: serverTimestamp() }, { merge: true });
+  await batch.commit();
+}
+
+$("composer").addEventListener("submit", async e => {
+  e.preventDefault();
+  const input = $("message");
+  const text = input.value.trim().slice(0, 1500);
+  if (!text || !currentKey) return;
+  if (!antiSpamOk(text)) return;
+  const data = { type: "text", text };
+  if (replyTo) { data.replyTo = replyTo; cancelReply(); }
+  if (noteMode) { data.expiresAt = Date.now() + 24 * 3600 * 1000; data.type = "note"; setNoteMode(false); }
+  input.value = "";
+  $("typinginfo").textContent = "";
+  try { await pushMessage(data); } catch (err) {
+    console.error(err);
+    input.value = text;
+    alert("Message non envoyé.");
+  }
+});
+
+/* ============ Pièces jointes : images (compression canvas) ============ */
+$("attachbtn").addEventListener("click", () => $("fileinput").click());
+$("fileinput").addEventListener("change", async e => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file || !currentKey) return;
+  if (!file.type.startsWith("image/")) { alert("Images uniquement."); return; }
+  if (file.size > 8 * 1024 * 1024) { alert("Image trop lourde (max 8 Mo avant compression)."); return; }
+  try {
+    const blob = await compressImage(file);
+    const msgRef = doc(collection(db, "rooms", currentKey, "messages"));
+    const path = `rooms/${currentKey}/${msgRef.id}.jpg`;
+    await uploadBytes(sref(storage, path), blob, { contentType: "image/jpeg" });
+    const url = await getDownloadURL(sref(storage, path));
+    await pushMessage({ type: "image", text: "", path, url });
+  } catch (err) { console.error(err); alert("Envoi de l'image impossible."); }
+});
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 1280;
+      let { width: w, height: h } = img;
+      if (w > max || h > max) { const r = max / Math.max(w, h); w = Math.round(w * r); h = Math.round(h * r); }
+      const cv = document.createElement("canvas");
+      cv.width = w; cv.height = h;
+      cv.getContext("2d").drawImage(img, 0, 0, w, h);
+      cv.toBlob(b => b ? resolve(b) : reject(new Error("toBlob")), "image/jpeg", 0.8);
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+/* ============ Messages vocaux ============ */
+let recorder = null, recording = false;
+$("micbtn").addEventListener("click", async () => {
+  if (!currentKey) return;
+  if (recording) { recorder.stop(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recorder = new MediaRecorder(stream);
+    const chunks = [];
+    recorder.ondataavailable = ev => chunks.push(ev.data);
+    recorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      recording = false; $("micbtn").textContent = "🎙";
+      const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+      if (blob.size < 500) return; // trop court = annulé
+      try {
+        const msgRef = doc(collection(db, "rooms", currentKey, "messages"));
+        const path = `rooms/${currentKey}/${msgRef.id}.webm`;
+        await uploadBytes(sref(storage, path), blob, { contentType: "audio/webm" });
+        const url = await getDownloadURL(sref(storage, path));
+        await pushMessage({ type: "audio", text: "", path, url });
+      } catch (err) { console.error(err); alert("Envoi vocal impossible."); }
+    };
+    recorder.start();
+    recording = true; $("micbtn").textContent = "⏹";
+    setTimeout(() => { if (recording) recorder.stop(); }, 30000); // max 30 s
+  } catch { alert("Micro non accessible (permission refusée ?)"); }
+});
+
+/* ============ Notes 24 h ============ */
+function setNoteMode(on) {
+  noteMode = on;
+  $("notebtn").style.background = on ? "var(--accent)" : "";
+  $("notebtn").style.color = on ? "var(--accent-ink)" : "";
+}
+$("notebtn").addEventListener("click", () => setNoteMode(!noteMode));
+
+/* ============ Stickers / GIF ============ */
+$("emoji").addEventListener("click", () => {
+  openModal("emojimodal");
+  const row = $("stickerrow"); row.innerHTML = "";
+  STICKERS.forEach(s => {
+    const b = document.createElement("button");
+    b.textContent = s;
+    b.onclick = () => { sendSticker(s); closeModal("emojimodal"); };
+    row.appendChild(b);
+  });
+  const hasKey = GIPHY_API_KEY.length > 0;
+  $("gifsearch").style.display = hasKey ? "block" : "none";
+  $("gifhint").textContent = hasKey ? "" : "Astuce : colle une clé API GIPHY gratuite dans GIPHY_API_KEY (script) pour activer la recherche GIF.";
+});
+async function sendSticker(s) {
+  if (!antiSpamOk("stk:" + s)) return;
+  try { await pushMessage({ type: "sticker", text: s }); } catch (e) { console.error(e); }
+}
+async function searchGif() {
+  const q = $("gifq").value.trim(); if (!q) return;
+  try {
+    const r = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(q)}&limit=12&rating=g`);
+    const j = await r.json();
+    const box = $("gifresults"); box.innerHTML = "";
+    (j.data || []).forEach(g => {
+      const img = document.createElement("img");
+      img.src = g.images.fixed_height_small.url;
+      img.style.cssText = "width:90px;border-radius:10px;cursor:pointer";
+      img.onclick = () => { sendGif(g.images.fixed_height.url); closeModal("emojimodal"); };
+      box.appendChild(img);
+    });
+  } catch (e) { console.error(e); alert("Recherche GIF impossible."); }
+}
+async function sendGif(url) {
+  if (!antiSpamOk("gif:" + url)) return;
+  try { await pushMessage({ type: "gif", text: "", url }); } catch (e) { console.error(e); }
+}
+
+/* ============ Mini-jeux ============ */
+function openGames() { openModal("gamesmodal"); }
+function newQuiz() { closeModal("gamesmodal"); openModal("quizmodal"); }
+async function sendQuiz() {
+  const question = $("quizq").value.trim();
+  const options = $("quizo").value.split("\n").map(s => s.trim()).filter(Boolean).slice(0, 4);
+  const answer = parseInt($("quiza").value, 10) - 1;
+  if (!question || options.length < 2 || answer < 0 || answer >= options.length) { alert("Vérifie la question, au moins 2 options et le numéro de la bonne réponse."); return; }
+  closeModal("quizmodal");
+  if (!antiSpamOk("quiz:" + question)) return;
+  try { await pushMessage({ type: "quiz", text: question, options, answer }); } catch (e) { console.error(e); }
+  $("quizq").value = ""; $("quizo").value = "";
+}
+function newRiddle() { closeModal("gamesmodal"); openModal("riddlemodal"); }
+async function sendRiddle() {
+  const q = $("riddleq").value.trim(), a = $("riddlea").value.trim();
+  if (!q || !a) { alert("Remplis la devinette et sa réponse."); return; }
+  closeModal("riddlemodal");
+  if (!antiSpamOk("riddle:" + q)) return;
+  try { await pushMessage({ type: "riddle", text: q, riddleAnswer: a }); } catch (e) { console.error(e); }
+  $("riddleq").value = ""; $("riddlea").value = "";
+}
+function newWord() { closeModal("gamesmodal"); openModal("wordmodal"); }
+async function sendWord() {
+  const w = $("worda").value.trim().toUpperCase().replace(/[^A-ZÀ-ÿ]/g, "");
+  if (w.length < 3) { alert("Mot trop court (3 lettres min)."); return; }
+  closeModal("wordmodal");
+  const scrambled = w.split("").sort(() => Math.random() - .5).join("");
+  if (scrambled === w) return sendWord(); // éviter le mot inchangé
+  if (!antiSpamOk("word:" + w)) return;
+  try { await pushMessage({ type: "word", text: scrambled, wordAnswer: w, solvedBy: [] }); } catch (e) { console.error(e); }
+  $("worda").value = "";
+}
+async function answerQuiz(msgId, idx, correctIdx) {
+  try {
+    await updateDoc(doc(db, "rooms", currentKey, "messages", msgId), { [`answers.${uid}`]: idx });
+    if (idx === correctIdx) alert("Bonne réponse 🎉"); else alert("Raté 😅");
+    renderAll(); // force re-render pour afficher les barres de résultats
+  } catch (e) { console.error(e); }
+}
+
+/* ============ Réponses (reply) ============ */
+function startReply(id, name, text) {
+  replyTo = { id, name, text: String(text).slice(0, 80) };
+  $("replytext").textContent = "↩ Réponse à " + name + " : " + replyTo.text;
+  $("replybar").classList.add("on");
+  $("message").focus();
+}
+function cancelReply() { replyTo = null; $("replybar").classList.remove("on"); }
+
+/* ============ Réactions ============ */
+async function toggleReaction(msgId, emoji) {
+  const ref = doc(db, "rooms", currentKey, "messages", msgId);
+  try {
+    const snap = await getDoc(ref);
+    const list = (snap.data().reactions || {})[emoji] || [];
+    await updateDoc(ref, {
+      [`reactions.${emoji}`]: list.includes(uid) ? arrayRemove(uid) : arrayUnion(uid)
+    });
+  } catch (e) { console.error(e); }
+}
+
+/* ============ Modifier / supprimer ============ */
+async function editMessage(id, current) {
+  const next = prompt("Modifier ton message :", current);
+  if (next === null) return;
+  const text = next.trim().slice(0, 1500);
+  if (!text) return;
+  try { await updateDoc(doc(db, "rooms", currentKey, "messages", id), { text, edited: true }); }
+  catch (e) { console.error(e); alert("Modification impossible."); }
+}
+async function deleteMessage(id, path) {
+  if (!confirm("Supprimer ce message ?")) return;
+  try {
+    await deleteDoc(doc(db, "rooms", currentKey, "messages", id));
+    if (path) deleteObject(sref(storage, path)).catch(() => {});
+  } catch (e) { console.error(e); alert("Suppression impossible."); }
+}
+
+/* ============ Rendu des messages ============ */
+function linkify(escaped) {
+  return escaped.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+}
+function linkPreview(text) {
+  const m = String(text).match(/https?:\/\/([^/\s]+)/);
+  if (!m) return "";
+  const domain = m[1];
+  return `<a class="linkcard" href="${m[0]}" target="_blank" rel="noopener">
+    <img src="https://www.google.com/s2/favicons?domain=${domain}&sz=64" alt="">
+    <span>${escapeHTML(domain)}<br><small>Ouvrir le lien ↗</small></span></a>`;
+}
+function isOnline(m) {
+  return m.lastSeen && (Date.now() - m.lastSeen.toDate().getTime()) < 90000;
+}
+
+function renderMessage(ch) {
+  const d = ch.doc.data();
+  const id = ch.doc.id;
+  if (d.expiresAt && d.expiresAt < Date.now()) return null; // note expirée
+  const mine = d.uid === uid;
+  const item = document.createElement("div");
+  item.className = "msg" + (mine ? " mine" : "") + (d.edited ? " edited" : "");
+  item.dataset.id = id;
+
+  const replyHTML = d.replyTo
+    ? `<span class="replyquote">↩ ${escapeHTML(d.replyTo.name)} : ${escapeHTML(d.replyTo.text)}</span>` : "";
+
+  const noteHTML = d.type === "note"
+    ? `<span class="notetag">⏳ Note · expire ${d.expiresAt ? new Date(d.expiresAt).toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"}) : ""}</span>` : "";
+
+  let body = "";
+  switch (d.type) {
+    case "image": body = `<img class="att" src="${d.url}" alt="image" loading="lazy">`; break;
+    case "gif": body = `<img class="att" src="${d.url}" alt="gif" loading="lazy">`; break;
+    case "audio": body = `<audio controls src="${d.url}"></audio>`; break;
+    case "sticker": body = `<span class="sticker">${escapeHTML(d.text)}</span>`; break;
+    case "quiz": body = renderQuiz(d, id); break;
+    case "riddle": body = renderRiddle(d, id); break;
+    case "word": body = renderWord(d, id); break;
+    default: {
+      const esc = escapeHTML(d.text);
+      body = (d.text.match(/@\w+/g) || []).length
+        ? esc.replace(/@(\w+)/g, '<strong style="color:var(--accent)">@$1</strong>')
+        : linkify(esc);
+      body += linkPreview(d.text);
+    }
+  }
+
+  // Réactions
+  let reacts = "";
+  const rmap = d.reactions || {};
+  const emojis = Object.keys(rmap).filter(e => rmap[e] && rmap[e].length);
+  if (emojis.length) {
+    reacts = '<div class="reactions">' + emojis.map(e =>
+      `<button class="react${rmap[e].includes(uid) ? " mine" : ""}" onclick="toggleReaction('${id}','${e}')">${e} ${rmap[e].length}</button>`
+    ).join("") + "</div>";
+  }
+
+  // Outils (apparait au tap sur la bulle)
+  const canMod = mine || isAdmin;
+  const tools = `<div class="msgtools">
+    <button onclick="startReply('${id}','${escapeHTML(d.name).replace(/'/g, "\\'")}','${escapeHTML(String(d.text || d.type)).replace(/'/g, "\\'")}')">↩ Répondre</button>
+    <button onclick="openReactPicker('${id}')">＋ Réagir</button>
+    ${mine && d.type === "text" ? `<button onclick="editMessage('${id}','${escapeHTML(d.text).replace(/'/g, "\\'")}')">✏️</button>` : ""}
+    ${canMod ? `<button class="danger" onclick="deleteMessage('${id}','${d.path || ""}')">🗑</button>` : ""}
+  </div>`;
+
+  item.innerHTML = `<div class="name">${escapeHTML(d.name)} · ${timeStr(d.createdAt)}</div>
+    <div class="bubble">${noteHTML}${replyHTML}${body}</div>${reacts}${tools}`;
+  item.querySelector(".bubble").addEventListener("click", () => item.classList.toggle("open"));
+  return item;
+}
+
+function renderQuiz(d, id) {
+  const answers = d.answers || {};
+  const total = Object.keys(answers).length;
+  const mineIdx = answers[uid];
+  const revealed = mineIdx !== undefined;
+  let html = `<strong>🧠 ${escapeHTML(d.text)}</strong>`;
+  d.options.forEach((opt, i) => {
+    const count = Object.values(answers).filter(a => a === i).length;
+    const pct = total ? Math.round(count / total * 100) : 0;
+    const cls = revealed && i === d.answer ? " correct" : (revealed && i === mineIdx && i !== d.answer ? " wrongpick" : "");
+    html += `<button class="quizopt${cls}" onclick="answerQuiz('${id}',${i},${d.answer})">
+      ${escapeHTML(opt)}${revealed ? `<span class="bar" style="width:${pct}%"></span><small> ${count} vote(s) · ${pct}%</small>` : ""}
+    </button>`;
+  });
+  return html;
+}
+function renderRiddle(d, id) {
+  const key = "gy_riddle_" + id;
+  const revealed = localStorage.getItem(key) === "1";
+  return `<strong>🤫 Devinette</strong><br>${escapeHTML(d.text)}<br>
+    ${revealed
+      ? `<em>Réponse : ${escapeHTML(d.riddleAnswer)}</em>`
+      : `<button class="quizopt" onclick="localStorage.setItem('${key}','1');renderAll()">Afficher la réponse</button>`}`;
+}
+function renderWord(d, id) {
+  const solved = (d.solvedBy || []).includes(uid);
+  if (!solved) {
+    const guess = prompt(`Mot mélangé : ${d.text}\nTa proposition :`);
+    if (guess && guess.trim().toUpperCase() === d.wordAnswer) {
+      updateDoc(doc(db, "rooms", currentKey, "messages", id), { solvedBy: arrayUnion(uid) })
+        .then(() => { alert("Bravo 🎉"); renderAll(); }).catch(console.error);
+    } else if (guess !== null) { alert("Raté, réessaie plus tard !"); }
+  }
+  return `<strong>🔀 Mot mélangé</strong><br><span style="font-size:22px;letter-spacing:.2em">${escapeHTML(d.text)}</span>
+    <div class="gameresult">${(d.solvedBy || []).length} personne(s) ont trouvé : ${(d.solvedBy || []).map(u => (membersCache[u] || {}).name || "?").join(", ")}</div>`;
+}
+
+/* Réactions : mini-panneau */
+function openReactPicker(id) {
+  const item = document.querySelector(`.msg[data-id="${id}"]`);
+  if (!item) return;
+  let row = item.querySelector(".quickreact");
+  if (row) { row.remove(); return; }
+  row = document.createElement("div");
+  row.className = "reactions quickreact";
+  row.style.marginTop = "4px";
+  EMOJIS_REACT.forEach(e => {
+    const b = document.createElement("button");
+    b.className = "react"; b.textContent = e;
+    b.onclick = ev => { ev.stopPropagation(); toggleReaction(id, e); row.remove(); };
+    row.appendChild(b);
+  });
+  item.appendChild(row);
+}
+
+/* ============ Listeners Firestore ============ */
+function listenMessages() {
+  if (unsubMsgs) unsubMsgs();
+  const q = query(collection(db, "rooms", currentKey, "messages"), orderBy("createdAt"), limit(200));
+  unsubMsgs = onSnapshot(q, snap => {
+    let changed = false;
+    snap.docChanges().forEach(ch => {
+      if (ch.type === "added") {
+        if (seenMsgs.has(ch.doc.id)) return;
+        seenMsgs.add(ch.doc.id);
+        const el = renderMessage(ch);
+        if (el) { $("messages").appendChild(el); changed = true; }
+      } else {
+        // modified / removed : re-render simple et fiable
+        const old = document.querySelector(`.msg[data-id="${ch.doc.id}"]`);
+        if (old) old.remove();
+        if (ch.type === "modified") {
+          const el = renderMessage(ch);
+          if (el) { $("messages").appendChild(el); changed = true; }
+        }
+      }
+    });
+    if (changed) $("messages").lastElementChild?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, err => console.error(err));
+}
+function renderAll() { // re-render complet (après jeux/réactions)
+  if (!unsubMsgs) return;
+  const box = $("messages");
+  // forcer un re-render en relançant le listener est trop lourd ; on recharge simplement :
+  const tmp = unsubMsgs; tmp(); unsubMsgs = null;
+  $("messages").innerHTML = ""; seenMsgs.clear();
+  listenMessages();
+}
+function listenMembers() {
+  if (unsubMembers) unsubMembers();
+  unsubMembers = onSnapshot(collection(db, "rooms", currentKey, "members"), snap => {
+    membersCache = {};
+    snap.forEach(d => membersCache[d.id] = d.data());
+    renderMembers();
+    const online = Object.values(membersCache).filter(isOnline).length;
+    $("onlinecount").textContent = online + " en ligne";
+  }, err => console.error(err));
+}
+function renderMembers() {
+  const list = $("memberslist"); list.innerHTML = "";
+  Object.entries(membersCache).sort((a, b) => (isOnline(b[1]) ? 1 : 0) - (isOnline(a[1]) ? 1 : 0)).forEach(([id, m]) => {
+    const div = document.createElement("div");
+    div.className = "member";
+    div.innerHTML = `<span class="av" style="background:${avatarColor(id)}">${escapeHTML(m.avatar || "🙂")}</span>
+      <span>${escapeHTML(m.name)}${id === uid ? " (toi)" : ""}</span>
+      <span class="st${isOnline(m) ? " on" : ""}">${isOnline(m) ? "● en ligne" : ""}</span>
+      ${isAdmin && id !== uid ? `<button class="icon" style="width:28px;height:28px;flex-basis:28px;font-size:13px" onclick="kickMember('${id}')" title="Retirer du salon">✕</button>` : ""}`;
+    list.appendChild(div);
+  });
+}
+function openMembers() { $("membersdrawer").classList.add("on"); }
+function closeMembers() { $("membersdrawer").classList.remove("on"); }
+
+/* Modération admin : bannissement = suppression du doc membre (le bannissement dur
+   côté règles se fait via la collection banned, gérée uniquement depuis la console) */
+async function kickMember(id) {
+  if (!confirm("Retirer ce membre du salon ?")) return;
+  try { await deleteDoc(doc(db, "rooms", currentKey, "members", id)); } catch (e) { console.error(e); }
+}
+
+/* ============ Profil ============ */
+function openProfile() {
+  $("profilename").value = nickname;
+  const row = $("avataremojis"); row.innerHTML = "";
+  AVATARS.forEach(a => {
+    const b = document.createElement("button");
+    b.textContent = a;
+    b.style.border = a === myAvatar ? "2px solid var(--accent)" : "2px solid transparent";
+    b.style.borderRadius = "10px";
+    b.onclick = () => { myAvatar = a; openProfile(); };
+    row.appendChild(b);
+  });
+  openModal("profilemodal");
+}
+async function saveProfile() {
+  const name = $("profilename").value.trim().slice(0, 24);
+  if (!name) { alert("Le pseudo ne peut pas être vide."); return; }
+  nickname = name; saveProfileLocal();
+  closeModal("profilemodal");
+  if (currentKey) joinPresence(); // met à jour name/avatar dans members
+}
+
+/* ============ Partage ============ */
+function shareRoom() {
+  const text = "Rejoins mon salon gegyY avec la clé : " + currentKey;
+  if (navigator.share) navigator.share({ title: "Mon salon gegyY", text }).catch(() => {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => alert("Clé copiée !")).catch(() => alert(text));
+  else alert(text);
+}
+
+/* ============ PWA ============ */
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+/* Les onclick="..." du HTML ont besoin de fonctions globales */
+Object.assign(window, {
+  show, createRoom, joinRoom, leaveRoom, shareRoom,
+  openMembers, closeMembers, openProfile, saveProfile,
+  openGames, newQuiz, sendQuiz, newRiddle, sendRiddle, newWord, sendWord,
+  searchGif, startReply, cancelReply, toggleReaction, openReactPicker,
+  editMessage, deleteMessage, answerQuiz, kickMember, renderAll,
+  openModal, closeModal
+});
+</script>
+</body>
+</html>
